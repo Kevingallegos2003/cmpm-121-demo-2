@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: rgba(22, 239, 221, 0.87);
   background-color: #242424;
 
   font-synthesis: none;
@@ -53,7 +53,12 @@ h1 {
 .logo.vanilla:hover {
   filter: drop-shadow(0 0 2em #3178c6aa);
 }
-
+canvas{
+  border-radius: 30px;
+  border-color: black;
+  background-color: white;
+  filter: drop-shadow(8px 5px 5px #706f6f);
+}
 .card {
   padding: 2em;
 }
