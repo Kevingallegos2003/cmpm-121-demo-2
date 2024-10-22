@@ -7,6 +7,8 @@ const canvas = document.createElement("canvas");
 const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
 const undoB = document.createElement("button");
 const redoB = document.createElement("button");
+const thinB = document.createElement("button");
+const thickB = document.createElement("button");
 canvas.height = canvas.width = 256;
 interface displays{
   display(ctx: CanvasRenderingContext2D): void;
@@ -42,7 +44,7 @@ function displayObj(): displays{
 let linez:displays[] = [];
 let redoLinez:displays[] = [];
 let drawing = false;
-let CurrSize = 3;
+let CurrSize = 2;
 let CurrLine: displays;
 const drawchangEvent = new Event("drawing-changed");
 
@@ -76,6 +78,8 @@ const clearButton = document.createElement("button");
 clearButton.innerHTML = "clear";
 undoB.innerHTML = "undo";
 redoB.innerHTML = "redo";
+thinB.innerHTML = "Thin Line";
+thickB.innerHTML = "Thick Line";
 
 clearButton.addEventListener("click", () => {
     linez = [];
@@ -95,14 +99,23 @@ redoB.addEventListener("click",() =>{
     canvas.dispatchEvent(drawchangEvent);
   }
 });
-canvas.addEventListener("drawing-changed", function () {
+thinB.addEventListener("click",() =>{
+  if(CurrSize > 1){
+    CurrLine.setsize(CurrSize--);
+  }
 
-  console.log("array: ", linez);
+});
+thickB.addEventListener("click",() =>{
+  if(CurrSize < 30){
+    CurrLine.setsize(CurrSize++);
+  }
+
+});
+canvas.addEventListener("drawing-changed", function () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for(let i=0;i<linez.length;i++){
     linez[i].display(ctx);
   }
-  console.log("new draw array: ", linez);
 });
 
 
@@ -111,3 +124,5 @@ app.append(canvas);
 app.append(clearButton);
 app.append(undoB);
 app.append(redoB);
+app.append(thinB);
+app.append(thickB);
