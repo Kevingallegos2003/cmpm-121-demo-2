@@ -5,15 +5,16 @@ const app = document.querySelector<HTMLDivElement>("#app")!;
 const header = document.createElement("h1");
 const canvas = document.createElement("canvas");
 const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
-
+const undoB = document.createElement("button");
+const redoB = document.createElement("button");
 canvas.height = canvas.width = 256;
 
 interface Point{
   x: number;
   y: number;
 }
-let lines:Point[][] = [];
-const redoLines:number[] = [];
+const lines:Point[][] = [];
+const redoLines:Point[][] = [];
 
 let currentLine:Point[]= [];
 const cursor = { active: false, x: 0, y: 0 };
@@ -27,7 +28,6 @@ canvas.addEventListener("mousedown", (e) => {
     cursor.active = true;
     cursor.x = e.offsetX;
     cursor.y = e.offsetY;
-
     currentLine = [];
     lines.push(currentLine);
     redoLines.splice(0, redoLines.length);
@@ -44,13 +44,33 @@ canvas.addEventListener("mousemove", (e) => {
 });
 canvas.addEventListener("mouseup", () => {
     cursor.active = false;
-    lines = [];
+    currentLine = [];
+    canvas.dispatchEvent(drawchangEvent);
 });
 const clearButton = document.createElement("button");
 clearButton.innerHTML = "clear";
+undoB.innerHTML = "undo";
+redoB.innerHTML = "redo";
 
 clearButton.addEventListener("click", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    lines.splice(0,lines.length);
+    canvas.dispatchEvent(drawchangEvent);
+});
+undoB.addEventListener("click",() =>{
+  if(lines.length > 0){
+    const lastline = lines[lines.length-1];
+    lines.splice(lines.length - 1, 1);
+    redoLines.push(lastline);
+    canvas.dispatchEvent(drawchangEvent);
+  }
+});
+redoB.addEventListener("click",() =>{
+  if(redoLines.length > 0){
+    const lastline = redoLines[redoLines.length-1];
+    redoLines.splice(redoLines.length -1, 1);
+    lines.push(lastline);
+    canvas.dispatchEvent(drawchangEvent);
+  }
 });
 canvas.addEventListener("drawing-changed", function () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -66,7 +86,11 @@ canvas.addEventListener("drawing-changed", function () {
     }
   }
 });
+
+
 app.append(header);
 app.append(canvas);
 app.append(clearButton);
+app.append(undoB);
+app.append(redoB);
 canvas.height = canvas.width = 256;
