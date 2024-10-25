@@ -13,6 +13,7 @@ const thickB = document.createElement("button");
 const emoji1 = document.createElement("button");
 const emoji2 = document.createElement("button");
 const emoji3 = document.createElement("button");
+const emoji4 = document.createElement("button");
 const pen = document.createElement("button");
 const emoArr:string[] = ["","🥴","👌","🍕"];
 
@@ -152,6 +153,7 @@ thickB.innerHTML = "Thick Line";
 emoji1.innerHTML = "🥴";
 emoji2.innerHTML = "👌";
 emoji3.innerHTML = "🍕";
+emoji4.innerHTML = "CUSTOM";
 pen.innerHTML = "✏️";
 
 
@@ -212,6 +214,12 @@ emoji3.addEventListener("click",() =>{
   stickerz = true;emoji=3;
 
 });
+emoji4.addEventListener("click",() =>{
+  const sign = prompt("What's your sign?");
+  console.log(sign);
+  emoArr.push(sign!);
+  stickerz = true;emoji=emoArr.length-1;
+});
 pen.addEventListener("click",() =>{
   console.log("Pen used");
   stickerz = false;emoji=0;
@@ -246,6 +254,7 @@ app.append(thickB);
 app.append(emoji1);
 app.append(emoji2);
 app.append(emoji3);
+app.append(emoji4);
 app.append(undoB);
 app.append(redoB);
 app.append(clearButton);
