@@ -5,10 +5,13 @@ const app = document.querySelector<HTMLDivElement>("#app")!;
 const header = document.createElement("h1");
 const canvas = document.createElement("canvas");
 const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
+const ctx1 = <CanvasRenderingContext2D>canvas.getContext("2d");
 const undoB = document.createElement("button");
 const redoB = document.createElement("button");
 const thinB = document.createElement("button");
 const thickB = document.createElement("button");
+
+
 canvas.height = canvas.width = 256;
 interface displays{
   display(ctx: CanvasRenderingContext2D): void;
@@ -41,17 +44,42 @@ function displayObj(): displays{
   }
   return{display, addPoint, setsize}
 }
+interface displaymouse{
+  display(ctx: CanvasRenderingContext2D): void;
+  addcords(x:number, y:number): void;
+  getcords():void;
+}
+function mouseObj():displaymouse{
+  let cordx:number;
+  let cordy:number;
+  function display(ctx: CanvasRenderingContext2D){
+    ctx.font = "32px monospace";
+    ctx.fillText("*",cordx-8,cordy+16);
+  }
+  function addcords(x:number, y:number){
+    cordx = x;
+    cordy = y;
+  }
+  function getcords(){
+    return {x:cordx, y:cordy};
+  }
+  return{display, addcords, getcords};
+}
 let linez:displays[] = [];
 let redoLinez:displays[] = [];
 let drawing = false;
 let CurrSize = 2;
 let CurrLine: displays;
+//let mousePos: displaymouse;
 const drawchangEvent = new Event("drawing-changed");
+const mouseEvent = new Event("tool-moved");
 
 document.title = APP_NAME;
 header.innerHTML = APP_NAME;
 
-
+const mousePos = mouseObj();
+mousePos.addcords(-1,-1);
+mousePos.display(ctx1);
 canvas.addEventListener("mousedown", (e) => {
   CurrLine = displayObj();
   CurrLine.setsize(CurrSize);
@@ -61,9 +89,14 @@ canvas.addEventListener("mousedown", (e) => {
 
 });
 canvas.addEventListener("mousemove", (e) => {
+  mousePos.addcords(e.offsetX,e.offsetY);
   if(drawing){
     CurrLine.addPoint(e.offsetX, e.offsetY);
     canvas.dispatchEvent(drawchangEvent);
+    mousePos.display(ctx1);
+  }
+  else{
+    canvas.dispatchEvent(mouseEvent);
   }
 });
 canvas.addEventListener("mouseup", (e) => {
@@ -111,11 +144,20 @@ thickB.addEventListener("click",() =>{
   }
 
 });
+
+canvas.addEventListener("mouseout", ()=>{
+  canvas.dispatchEvent(drawchangEvent);
+
+});
 canvas.addEventListener("drawing-changed", function () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for(let i=0;i<linez.length;i++){
     linez[i].display(ctx);
   }
+});
+canvas.addEventListener("tool-moved", function(){
+  canvas.dispatchEvent(drawchangEvent);
+  mousePos.display(ctx1);
 });
 
 
