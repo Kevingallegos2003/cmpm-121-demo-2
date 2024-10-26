@@ -70,7 +70,7 @@ interface displaySticker{
 function stickerObj(): displaySticker{
   let Spoints:{x:number; y:number; e:number};
   let scalez:number = 1;
-  const width:number = 40;
+  const width:number = 35;
   function addSticker(x:number, y:number,e:number){
     Spoints = {x,y,e};
   }
@@ -78,6 +78,8 @@ function stickerObj(): displaySticker{
     console.log(Spoints);
   }
   function display(ctx: CanvasRenderingContext2D){
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
     ctx.font = scalez*width+"px serif";
     ctx.fillText(emoArr[Spoints.e],Spoints.x,Spoints.y);
   }
@@ -98,7 +100,7 @@ function mouseObj():displaymouse{
   let cordy:number;
   function display(ctx: CanvasRenderingContext2D){
     ctx.font = "32px monospace";
-    ctx.fillText("*",cordx-8,cordy+16);
+    ctx.fillText("*",cordx-7,cordy+16);
   }
   function addcords(x:number, y:number){
     cordx = x;
@@ -260,7 +262,7 @@ const ctx2 = scaledCanvas.getContext("2d");
   console.log("export");
   const anchor = document.createElement("a");
   anchor.href = scaledCanvas.toDataURL("image/png");
-  anchor.download = "sketchpad.png";
+  anchor.download = "KookyDrawing.png";
   anchor.click();
 
 
