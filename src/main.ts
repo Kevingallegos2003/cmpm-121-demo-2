@@ -14,20 +14,24 @@ const emoji1 = document.createElement("button");
 const emoji2 = document.createElement("button");
 const emoji3 = document.createElement("button");
 const emoji4 = document.createElement("button");
+const exportB = document.createElement("button");
 const pen = document.createElement("button");
 const emoArr:string[] = ["","🥴","👌","🍕"];
-
+exportB.style.width = "140px";
+exportB.style.height = "60px";
+exportB.style.fontSize = "20px";
 
 canvas.height = canvas.width = 256;
 interface displays{
   display(ctx: CanvasRenderingContext2D): void;
   addPoint(x:number, y:number): void;
   setsize(s:number): void;
+  setscale(s:number):void;
 }
 function displayObj(): displays{
   const Apoints:{x:number; y:number}[] = [];
   let linesize:number;
-
+  let scalez:number = 1;
   function setsize(s:number){
     linesize = s;
   }
@@ -36,27 +40,37 @@ function displayObj(): displays{
     Apoints.push(point);
   }
   function drawLine(line: CanvasRenderingContext2D, size: number, x1: number, y1:number, x2:number,y2:number){
-    line.lineWidth = size;
+    line.lineWidth = size*scalez;
     line.beginPath();
     line.moveTo(x1,y1);
     line.lineTo(x2,y2);
     line.stroke();
     line.closePath();
   }
+  function setscale(s:number){
+    for(let i =0;i<Apoints.length;i++){
+      Apoints[i].x*=s;
+      Apoints[i].y*=s;
+      scalez = s;
+    }
+  }
   function display(ctx: CanvasRenderingContext2D){
     for(let i =1;i<Apoints.length;i++){
       drawLine(ctx, linesize, Apoints[i-1].x, Apoints[i-1].y, Apoints[i].x,Apoints[i].y);
     }
   }
-  return{display, addPoint, setsize}
+  return{display, addPoint, setscale, setsize}
 }
 interface displaySticker{
   display(ctx: CanvasRenderingContext2D): void;
   addSticker(x:number, y:number, e:number):void;
   getcords():void;
+  setscale(s:number):void;
 }
 function stickerObj(): displaySticker{
   let Spoints:{x:number; y:number; e:number};
+  let scalez:number = 1;
+  const width:number = 40;
   function addSticker(x:number, y:number,e:number){
     Spoints = {x,y,e};
   }
@@ -64,9 +78,15 @@ function stickerObj(): displaySticker{
     console.log(Spoints);
   }
   function display(ctx: CanvasRenderingContext2D){
+    ctx.font = scalez*width+"px serif";
     ctx.fillText(emoArr[Spoints.e],Spoints.x,Spoints.y);
   }
-  return{display, addSticker, getcords}
+  function setscale(s:number){
+      scalez = s;
+      Spoints.x*=s;
+      Spoints.y*=s;
+  }
+  return{display, addSticker, setscale, getcords}
 }
 interface displaymouse{
   display(ctx: CanvasRenderingContext2D): void;
@@ -154,6 +174,7 @@ emoji1.innerHTML = "🥴";
 emoji2.innerHTML = "👌";
 emoji3.innerHTML = "🍕";
 emoji4.innerHTML = "CUSTOM";
+exportB.innerHTML = "EXPORT";
 pen.innerHTML = "✏️";
 
 
@@ -200,33 +221,51 @@ thickB.addEventListener("click",() =>{
 
 });
 emoji1.addEventListener("click",() =>{
-  console.log("🥴");
   stickerz = true;emoji=1;
 
 });
 emoji2.addEventListener("click",() =>{
-  console.log("👌");
   stickerz = true;emoji=2;
 
 });
 emoji3.addEventListener("click",() =>{
-  console.log("🍕");
   stickerz = true;emoji=3;
 
 });
 emoji4.addEventListener("click",() =>{
   const sign = prompt("What's your sign?");
-  console.log(sign);
   emoArr.push(sign!);
   stickerz = true;emoji=emoArr.length-1;
 });
 pen.addEventListener("click",() =>{
-  console.log("Pen used");
   stickerz = false;emoji=0;
 
 });
+exportB.addEventListener("click",() =>{
+const scaledCanvas = document.createElement("canvas");
+scaledCanvas.width = canvas.width * 4;
+scaledCanvas.height = canvas.height * 4;
+const ctx2 = scaledCanvas.getContext("2d");
+  const copyStick:displaySticker[] = Spoints;
+  const copyLinez:displays[] = linez;
+  for(let i=0;i<copyLinez.length;i++){
+    copyLinez[i].setscale(4);
+    copyLinez[i].display(ctx2!);
+  }
+  for(let i=0;i<copyStick.length;i++){
+    copyStick[i].setscale(4);
+    copyStick[i].getcords();
+    copyStick[i].display(ctx2!);
+  }
+  console.log("export");
+  const anchor = document.createElement("a");
+  anchor.href = scaledCanvas.toDataURL("image/png");
+  anchor.download = "sketchpad.png";
+  anchor.click();
 
 
+
+});
 canvas.addEventListener("mouseout", ()=>{
   canvas.dispatchEvent(drawchangEvent);
 
@@ -247,6 +286,7 @@ canvas.addEventListener("tool-moved", function(){
 
 
 app.append(header);
+header.append(exportB);
 app.append(canvas);
 app.append(pen);
 app.append(thinB);
