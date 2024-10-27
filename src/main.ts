@@ -4,6 +4,7 @@ const APP_NAME = "Kooky Sticker Sketchpad";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const header = document.createElement("h1");
 const canvas = document.createElement("canvas");
+const btnDiv = document.createElement("div");
 const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
 const ctx1 = <CanvasRenderingContext2D>canvas.getContext("2d");
 const undoB = document.createElement("button");
@@ -16,6 +17,12 @@ const emoji3 = document.createElement("button");
 const emoji4 = document.createElement("button");
 const exportB = document.createElement("button");
 const pen = document.createElement("button");
+let colorz:number = 0;
+const black = document.createElement("button");
+const red = document.createElement("button");
+const blue = document.createElement("button");
+const green = document.createElement("button");
+const rainbow = document.createElement("button");
 const emoArr:string[] = ["","🥴","👌","🍕"];
 exportB.style.width = "140px";
 exportB.style.height = "60px";
@@ -30,6 +37,7 @@ interface displays{
 }
 function displayObj(): displays{
   const Apoints:{x:number; y:number}[] = [];
+  const colors:string[] = ["black","blue","red","green"];
   let linesize:number;
   let scalez:number = 1;
   function setsize(s:number){
@@ -39,7 +47,9 @@ function displayObj(): displays{
     const point = {x,y};
     Apoints.push(point);
   }
-  function drawLine(line: CanvasRenderingContext2D, size: number, x1: number, y1:number, x2:number,y2:number){
+  function drawLine(line: CanvasRenderingContext2D, size: number, x1: number, y1:number, x2:number,y2:number,s:number){
+    line.strokeStyle = colors[s];
+    line.fillStyle = colors[s];
     line.lineWidth = size*scalez;
     line.beginPath();
     line.moveTo(x1,y1);
@@ -55,8 +65,9 @@ function displayObj(): displays{
     }
   }
   function display(ctx: CanvasRenderingContext2D){
+
     for(let i =1;i<Apoints.length;i++){
-      drawLine(ctx, linesize, Apoints[i-1].x, Apoints[i-1].y, Apoints[i].x,Apoints[i].y);
+      drawLine(ctx, linesize, Apoints[i-1].x, Apoints[i-1].y, Apoints[i].x,Apoints[i].y,colorz);
     }
   }
   return{display, addPoint, setscale, setsize}
@@ -178,6 +189,11 @@ emoji3.innerHTML = "🍕";
 emoji4.innerHTML = "CUSTOM";
 exportB.innerHTML = "EXPORT";
 pen.innerHTML = "✏️";
+black.innerHTML = "⬛";
+blue.innerHTML = "🟦";
+red.innerHTML = "🟥";
+green.innerHTML = "🟩";
+rainbow.innerHTML = "🌈"
 
 
 clearButton.addEventListener("click", () => {
@@ -268,6 +284,30 @@ const ctx2 = scaledCanvas.getContext("2d");
 
 
 });
+black.addEventListener("click",() =>{
+  if(!stickerz){
+    colorz = 0;
+  }
+
+});
+red.addEventListener("click",() =>{
+  if(!stickerz){
+    colorz = 1;
+  }
+
+});
+blue.addEventListener("click",() =>{
+  if(!stickerz){
+    colorz = 2;
+  }
+
+});
+green.addEventListener("click",() =>{
+  if(!stickerz){
+    colorz = 3;
+  }
+
+});
 canvas.addEventListener("mouseout", ()=>{
   canvas.dispatchEvent(drawchangEvent);
 
@@ -290,13 +330,18 @@ canvas.addEventListener("tool-moved", function(){
 app.append(header);
 header.append(exportB);
 app.append(canvas);
-app.append(pen);
-app.append(thinB);
-app.append(thickB);
+app.append(btnDiv);
+btnDiv.append(pen);
+btnDiv.append(black);
+btnDiv.append(blue);
+btnDiv.append(red);
+btnDiv.append(green);
+btnDiv.append(thinB);
+btnDiv.append(thickB);
 app.append(emoji1);
 app.append(emoji2);
 app.append(emoji3);
 app.append(emoji4);
-app.append(undoB);
-app.append(redoB);
+btnDiv.append(undoB);
+btnDiv.append(redoB);
 app.append(clearButton);
