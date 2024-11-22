@@ -17,7 +17,8 @@ const emoji3 = document.createElement("button");
 const emoji4 = document.createElement("button");
 const exportB = document.createElement("button");
 const pen = document.createElement("button");
-let colorz:number = 0;
+const colorz:string[] = ["black","blue","red","green"];
+let currentColor = colorz[0];
 const black = document.createElement("button");
 const red = document.createElement("button");
 const blue = document.createElement("button");
@@ -37,7 +38,6 @@ interface displays{
 }
 function displayObj(): displays{
   const Apoints:{x:number; y:number}[] = [];
-  const colors:string[] = ["black","blue","red","green"];
   let linesize:number;
   let scalez:number = 1;
   function setsize(s:number){
@@ -47,9 +47,9 @@ function displayObj(): displays{
     const point = {x,y};
     Apoints.push(point);
   }
-  function drawLine(line: CanvasRenderingContext2D, size: number, x1: number, y1:number, x2:number,y2:number,s:number){
-    line.strokeStyle = colors[s];
-    line.fillStyle = colors[s];
+  function drawLine(line: CanvasRenderingContext2D, size: number, x1: number, y1:number, x2:number,y2:number){
+    line.strokeStyle = currentColor;
+    line.fillStyle = currentColor;
     line.lineWidth = size*scalez;
     line.beginPath();
     line.moveTo(x1,y1);
@@ -67,7 +67,7 @@ function displayObj(): displays{
   function display(ctx: CanvasRenderingContext2D){
 
     for(let i =1;i<Apoints.length;i++){
-      drawLine(ctx, linesize, Apoints[i-1].x, Apoints[i-1].y, Apoints[i].x,Apoints[i].y,colorz);
+      drawLine(ctx, linesize, Apoints[i-1].x, Apoints[i-1].y, Apoints[i].x,Apoints[i].y);
     }
   }
   return{display, addPoint, setscale, setsize}
@@ -110,8 +110,12 @@ function mouseObj():displaymouse{
   let cordx:number;
   let cordy:number;
   function display(ctx: CanvasRenderingContext2D){
-    ctx.font = "32px monospace";
-    ctx.fillText("*",cordx-7,cordy+16);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cordx, cordy, CurrSize, 0, Math.PI * 2);
+    ctx.fillStyle = currentColor;
+    ctx.fill();
+    ctx.restore();
   }
   function addcords(x:number, y:number){
     cordx = x;
@@ -286,25 +290,25 @@ const ctx2 = scaledCanvas.getContext("2d");
 });
 black.addEventListener("click",() =>{
   if(!stickerz){
-    colorz = 0;
-  }
-
-});
-red.addEventListener("click",() =>{
-  if(!stickerz){
-    colorz = 1;
+    currentColor = "black";
   }
 
 });
 blue.addEventListener("click",() =>{
   if(!stickerz){
-    colorz = 2;
+    currentColor = "blue";
+  }
+
+});
+red.addEventListener("click",() =>{
+  if(!stickerz){
+    currentColor = "red";
   }
 
 });
 green.addEventListener("click",() =>{
   if(!stickerz){
-    colorz = 3;
+    currentColor = "green";
   }
 
 });
